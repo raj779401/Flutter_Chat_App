@@ -8,6 +8,22 @@ class AuthenticationScreen extends StatefulWidget {
 }
 
 class _AuthenticationScreenState extends State<AuthenticationScreen> {
+  final _formKey = GlobalKey<FormState>();
+  var _enteredEmail = '';
+  var _eneteredPassword = '';
+  void _submitForm() {
+    final isValid = _formKey.currentState != null
+        ? _formKey.currentState!.validate()
+        : false;
+    if (!isValid) {
+      if (_formKey.currentState != null) {
+        _formKey.currentState!.save();
+        print(_eneteredPassword);
+        print(_enteredEmail);
+      }
+    }
+  }
+
   bool _isLogin = true;
   @override
   Widget build(BuildContext context) {
@@ -43,11 +59,31 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                             keyboardType: TextInputType.emailAddress,
                             autocorrect: false,
                             textCapitalization: TextCapitalization.none,
+                            validator: (value) {
+                              if (value == null ||
+                                  value.trim().isEmpty ||
+                                  value.contains("@")) {
+                                return 'Please enter a valid email address';
+                              }
+                              return null;
+                            },
+                            onSaved: (value) {
+                              _enteredEmail = value!;
+                            },
                           ),
                           SizedBox(height: 10),
                           TextFormField(
                             decoration: InputDecoration(labelText: 'Password'),
                             obscureText: true,
+                            validator: (value) {
+                              if (value == null || value.length < 6) {
+                                return 'Password must be at least 6 characters long';
+                              }
+                              return null;
+                            },
+                            onSaved: (value) {
+                              _eneteredPassword = value!;
+                            },
                           ),
                           const SizedBox(height: 30),
                           ElevatedButton(
@@ -55,7 +91,7 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                                 backgroundColor: Theme.of(context)
                                     .colorScheme
                                     .primaryContainer),
-                            onPressed: () {},
+                            onPressed: _submitForm,
                             child: Text(_isLogin ? 'Login' : 'SignUp'),
                           ),
                           TextButton(
