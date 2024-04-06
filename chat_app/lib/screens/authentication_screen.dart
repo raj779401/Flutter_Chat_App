@@ -19,6 +19,7 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
   var _enteredPassword = '';
   File? _selectedImage;
   bool _isLogin = true;
+  bool _isAuthenticating = false;
 
   void _submitForm() async {
     final isValid = _formKey.currentState != null
@@ -30,6 +31,9 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
 
     _formKey.currentState!.save();
     try {
+      setState(() {
+        _isAuthenticating = true;
+      });
       if (_isLogin) {
         final userCredential = await _firebase.signInWithEmailAndPassword(
             email: _enteredEmail, password: _enteredPassword);
@@ -53,6 +57,9 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
           content: Text(error.message ?? "Authentication Failed"),
         ),
       );
+      setState(() {
+        _isAuthenticating = false;
+      });
     }
   }
 
@@ -133,25 +140,28 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                           SizedBox(
                             height: 10,
                           ),
-                          ElevatedButton(
-                            onPressed: _submitForm, // Change this line
-                            child: Text(_isLogin ? 'Login' : 'SignUp'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Theme.of(context)
-                                  .colorScheme
-                                  .primaryContainer,
+                          if (_isAuthenticating) CircularProgressIndicator(),
+                          if (!_isAuthenticating)
+                            ElevatedButton(
+                              onPressed: _submitForm, // Change this line
+                              child: Text(_isLogin ? 'Login' : 'SignUp'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Theme.of(context)
+                                    .colorScheme
+                                    .primaryContainer,
+                              ),
                             ),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              setState(() {
-                                _isLogin = !_isLogin;
-                              });
-                            },
-                            child: Text(_isLogin
-                                ? 'Create New Account'
-                                : 'I already have an account'),
-                          )
+                          if (!_isAuthenticating)
+                            TextButton(
+                              onPressed: () {
+                                setState(() {
+                                  _isLogin = !_isLogin;
+                                });
+                              },
+                              child: Text(_isLogin
+                                  ? 'Create New Account'
+                                  : 'I already have an account'),
+                            )
                         ],
                       ),
                     ),
