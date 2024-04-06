@@ -3,7 +3,9 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
 class ImagePickerWidget extends StatefulWidget {
-  const ImagePickerWidget({super.key});
+  const ImagePickerWidget({super.key, required this.onPickedImage});
+
+  final void Function(File pickedImage) onPickedImage;
 
   @override
   State<ImagePickerWidget> createState() => _ImagePickerWidgetState();
@@ -23,6 +25,7 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
     setState(() {
       _pickedImageFile = File(pickedImage.path);
     });
+    widget.onPickedImage(_pickedImageFile!);
   }
 
   @override
