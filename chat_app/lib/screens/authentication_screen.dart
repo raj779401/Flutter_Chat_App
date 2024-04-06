@@ -18,6 +18,7 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
   final _formKey = GlobalKey<FormState>();
   var _enteredEmail = '';
   var _enteredPassword = '';
+  var _enteredUserName = '';
   File? _selectedImage;
   bool _isLogin = true;
   bool _isAuthenticating = false;
@@ -55,7 +56,7 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
             .collection('users')
             .doc(userCredential.user!.uid)
             .set({
-          'username': 'yet to be done',
+          'username': _enteredUserName,
           'email': _enteredEmail,
           'image_url': imageUrl,
         });
@@ -127,6 +128,27 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                               _enteredEmail = newValue!;
                             },
                           ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          if (!_isLogin)
+                            TextFormField(
+                              decoration: InputDecoration(
+                                labelText: 'UserName',
+                              ),
+                              enableSuggestions: false,
+                              validator: (value) {
+                                if (value == null ||
+                                    value.isEmpty ||
+                                    value.trim().length < 4) {
+                                  return "Please enter at least 4 characters";
+                                }
+                                return null;
+                              },
+                              onSaved: (newValue) {
+                                _enteredUserName = newValue!;
+                              },
+                            ),
                           SizedBox(
                             height: 10,
                           ),
